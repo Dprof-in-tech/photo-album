@@ -1,0 +1,16 @@
+# Standalone Cloudflare Worker whose only job is rendering a URL to PDF via the
+# native Browser Rendering binding (which Pages Functions can't have). The main
+# Pages app invokes it through a service binding — it is NOT publicly routable
+# (workers_dev = false), so it can't be used as an open PDF proxy.
+#
+# Deploy from the repo root:
+#   pnpm run deploy:pdf     (= wrangler deploy -c workers/pdf-renderer/wrangler.toml)
+name = "pdf-renderer"
+main = "index.ts"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+# Browser Rendering ("Browser Run") — native on Workers, free tier (10 min/day).
+[browser]
+binding = "BROWSER"

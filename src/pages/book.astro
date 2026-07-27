@@ -1,0 +1,9 @@
+---
+import Base from '@/layouts/Base.astro';
+import FlipBook from '@/components/FlipBook';
+---
+
+<Base title="Flip through — 3 Idiots & the Stooges" bg="#EFEBE4">
+  {/* client:only — react-pageflip is browser-only (touches window at import). */}
+  <FlipBook client:only="react" />
+</Base>

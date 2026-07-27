@@ -1,0 +1,22 @@
+# Cloudflare Pages config (@astrojs/cloudflare v12 targets Pages Functions).
+# Create the remote R2 bucket once before deploying:
+#   wrangler r2 bucket create school-memories-photos
+name = "school-memories-album"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Astro Cloudflare adapter build output (Pages advanced mode: _worker.js + _routes.json).
+pages_build_output_dir = "./dist"
+
+# R2 photo + text storage. Applied to the deployed Pages project from this file.
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "school-memories-photos"
+
+# Pages Functions can't hold a Browser Rendering binding, so server-side PDF is
+# delegated to the standalone `pdf-renderer` Worker (workers/pdf-renderer/) via
+# this service binding. Deploy that Worker first (`pnpm run deploy:pdf`).
+# Locally there's no service binding, so /api/pdf 501s → /print fallback.
+[[services]]
+binding = "PDF_RENDERER"
+service = "pdf-renderer"

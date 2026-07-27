@@ -1,0 +1,39 @@
+---
+import '@/styles/global.css';
+import AlbumApp from '@/components/AlbumApp';
+
+// Print/PDF layout: all 22 spreads at physical 16×8in, one per sheet, zero
+// margins, exact colors, no screen chrome. Also what /api/pdf captures.
+// Disable folios with ?folios=0.
+const folios = Astro.url.searchParams.get('folios') !== '0';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Print — 3 Idiots & the Stooges</title>
+    <style>
+      @page {
+        size: 16in 8in;
+        margin: 0;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <AlbumApp client:load print showPageNumbers={folios} />
+  </body>
+</html>
