@@ -1,8 +1,10 @@
 /// <reference types="astro/client" />
 /// <reference types="@cloudflare/workers-types" />
 
-// Public (client-visible) build-time env for the realtime sync client.
+// Public (client-visible) build-time env, inlined by Astro/Vite.
 interface ImportMetaEnv {
+  // 'local' → browser-only build (IndexedDB); anything else (incl. unset) → cloud.
+  readonly PUBLIC_STORAGE_MODE?: 'cloud' | 'local';
   readonly PUBLIC_SYNC_URL?: string;
   readonly PUBLIC_SYNC_TOKEN?: string;
 }

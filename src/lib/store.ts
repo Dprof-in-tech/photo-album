@@ -31,6 +31,8 @@ interface Entry {
 }
 
 import { getSync } from './sync';
+import { CLOUD } from './mode';
+import { LocalPhotoStore } from './local-store';
 
 const CHANNEL = 'school-memories-photos';
 // Poll is the cross-device backstop: slow when realtime WebSocket is on, fast
@@ -45,7 +47,22 @@ const sameCrop = (a: Crop, b: Crop) => a.x === b.x && a.y === b.y && a.scale ===
 type Listener = (id: string, value: SlotValue | null) => void;
 type Broadcast = { id: string; iv: number; crop: Crop } | { id: string; removed: true };
 
-class PhotoStore {
+// Backend-agnostic surface both implementations satisfy: the R2-backed
+// PhotoStore (cloud) and the IndexedDB LocalPhotoStore (browser-only). Consumers
+// depend only on this, so getStore() can return either.
+export interface PhotoStoreApi {
+  load(): Promise<void>;
+  isLoaded(): boolean;
+  get(id: string): SlotValue | null;
+  getAll(): Record<string, SlotValue>;
+  filledCount(ids?: string[]): number;
+  upload(id: string, blob: Blob, crop?: Crop): Promise<void>;
+  setCrop(id: string, crop: Crop): Promise<void>;
+  remove(id: string): Promise<void>;
+  subscribe(fn: Listener): () => void;
+}
+
+class PhotoStore implements PhotoStoreApi {
   private cache: Record<string, Entry> = {};
   private loaded = false;
   private loadP: Promise<void> | null = null;
@@ -220,9 +237,9 @@ class PhotoStore {
 
 const photoBase = (id: string) => `/api/photo/${encodeURIComponent(id)}`;
 
-let _store: PhotoStore | null = null;
-export function getStore(): PhotoStore {
-  if (!_store) _store = new PhotoStore();
+let _store: PhotoStoreApi | null = null;
+export function getStore(): PhotoStoreApi {
+  if (!_store) _store = CLOUD ? new PhotoStore() : new LocalPhotoStore();
   return _store;
 }
 

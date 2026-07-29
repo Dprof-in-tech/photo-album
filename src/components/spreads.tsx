@@ -65,15 +65,15 @@ function CaptionPlate({ pos, labelId, label, capId, cap }: { pos: React.CSSPrope
 
 // 2x2 grid + hero photo + one-liner (spreads 6, 13). Returns content only.
 function quietGrid(
-  cfg: { eyebrow: string; sub: string; grid: { id: string; ph: string }[]; mainId: string; mainPh: string; oneId: string; oneLines: string; folioL: string; folioR: string },
+  cfg: { eyebrowId: string; eyebrow: string; subId: string; sub: string; dpId: string; grid: { id: string; ph: string }[]; mainId: string; mainPh: string; oneId: string; oneLines: string; folioL: string; folioR: string },
   sp: boolean
 ): ReactNode {
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.24in', padding: '0.6in' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-          <span>{cfg.eyebrow}</span>
-          <span>{cfg.sub}</span>
+          <EditableText id={cfg.eyebrowId} as="span" defaultText={cfg.eyebrow} />
+          <EditableText id={cfg.subId} as="span" defaultText={cfg.sub} />
         </div>
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gridTemplateRows: 'minmax(0,1fr) minmax(0,1fr)', gap: '0.2in' }}>
           {cfg.grid.map((g) => (
@@ -87,7 +87,7 @@ function quietGrid(
           <ImageSlot id={cfg.mainId} shape="rect" placeholder={cfg.mainPh} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '0.6in 0.45in' }}>
-          <div style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted, textAlign: 'right' }}>Date · Place</div>
+          <EditableText id={cfg.dpId} as="div" defaultText="Date · Place" style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted, textAlign: 'right' }} />
           <EditableText id={cfg.oneId} as="p" multiline defaultText={cfg.oneLines} style={{ margin: 0, fontSize: 16, fontStyle: 'italic', lineHeight: 1.6, textAlign: 'right', textWrap: 'pretty', whiteSpace: 'pre-line' } as React.CSSProperties} />
           <Folio show={sp} n={cfg.folioR} style={{ textAlign: 'right' }} />
         </div>
@@ -111,29 +111,31 @@ export const SPREADS: SpreadDef[] = [
       <>
         <div style={{ background: color.ink, color: color.paper, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, padding: '0.8in', textAlign: 'center' }}>
           <div style={{ fontSize: 34, fontStyle: 'italic', lineHeight: 1.3, textWrap: 'balance' } as React.CSSProperties}>
-            the end
+            <EditableText id="cover-end" as="span" defaultText="the end" />
             <br />
-            <span style={{ fontSize: 18, fontStyle: 'normal', color: color.faint }}>(for now)</span>
+            <EditableText id="cover-end-sub" as="span" defaultText="(for now)" style={{ fontSize: 18, fontStyle: 'normal', color: color.faint }} />
           </div>
           <div style={{ width: '0.4in', borderTop: `1px solid ${color.darkHairline}` }} />
-          <div style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.26em', color: color.muted }}>3 Idiots &amp; the Stooges · 2026</div>
+          <EditableText id="cover-spine" as="div" defaultText="3 Idiots & the Stooges · 2026" style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.26em', color: color.muted }} />
         </div>
         <div style={{ background: color.paper, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0.7in 0.6in' }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }}>A highly unofficial record</div>
+          <EditableText id="cover-kicker" as="div" defaultText="A highly unofficial record" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }} />
           <div style={{ width: '1.5in', height: '1.5in', marginTop: '0.5in' }}>
             <ImageSlot id="cover-circle" shape="circle" placeholder="the crew" />
           </div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 14 }}>
-            <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.3em', color: color.muted }}>The last days of</div>
-            <h1 style={{ margin: 0, fontSize: 54, fontWeight: 500, lineHeight: 1.08, textWrap: 'balance' } as React.CSSProperties}>
-              3 Idiots
-              <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400 }}>&amp;</span> the Stooges
-            </h1>
+            <EditableText id="cover-pretitle" as="div" defaultText="The last days of" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.3em', color: color.muted }} />
+            <EditableText
+              id="cover-title"
+              as="h1"
+              multiline
+              defaultText={'3 Idiots\n& the Stooges'}
+              style={{ margin: 0, fontSize: 54, fontWeight: 500, lineHeight: 1.08, textWrap: 'balance', whiteSpace: 'pre-line' } as React.CSSProperties}
+            />
           </div>
           <div style={{ width: '100%', borderTop: `1px solid ${color.hairline}`, paddingTop: 14, display: 'flex', justifyContent: 'space-between', ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-            <span>Memories, mostly true</span>
-            <span>2026</span>
+            <EditableText id="cover-foot-l" as="span" defaultText="Memories, mostly true" />
+            <EditableText id="cover-foot-r" as="span" defaultText="2026" />
           </div>
         </div>
       </>
@@ -145,7 +147,7 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in' }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }}>An honest warning</div>
+          <EditableText id="s2-eyebrow" as="div" defaultText="An honest warning" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 22, maxWidth: '5in' }}>
             <EditableText id="s2-lede" as="p" multiline defaultText="Nothing in this book is in order. Some captions are exaggerated. All of it happened." style={{ margin: 0, fontSize: 24, lineHeight: 1.5, fontStyle: 'italic', textWrap: 'pretty' } as React.CSSProperties} />
             <EditableText id="s2-body" as="p" multiline defaultText="These are the last few weeks — collected as they happened, one random picture at a time. If you're in here and you look bad, that's the memory's fault, not the photographer's." style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: color.body, textWrap: 'pretty' } as React.CSSProperties} />
@@ -179,14 +181,14 @@ export const SPREADS: SpreadDef[] = [
             <ImageSlot id="s4-a" shape="rect" placeholder="Something ordinary that won't be ordinary later" />
           </div>
           <div style={{ gridRow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 6 }}>
-            <div style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>Date · Place</div>
+            <EditableText id="s4-dp-a" as="div" defaultText="Date · Place" style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }} />
             <EditableText id="s4-cap-a" as="p" defaultText="Short caption here — one line is plenty." style={{ margin: 0, fontSize: 14, fontStyle: 'italic', lineHeight: 1.5 }} />
           </div>
           <div style={{ gridRow: 2 }}>
             <ImageSlot id="s4-b" shape="rect" placeholder="The one nobody posed for" />
           </div>
           <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 6 }}>
-            <div style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>Date · Place</div>
+            <EditableText id="s4-dp-b" as="div" defaultText="Date · Place" style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }} />
             <EditableText id="s4-cap-b" as="p" defaultText="Another caption. Or leave it blank — silence is also a caption." style={{ margin: 0, fontSize: 14, fontStyle: 'italic', lineHeight: 1.5 }} />
           </div>
           <Folio show={sp} n="06" style={{ gridColumn: '1 / -1' }} />
@@ -197,8 +199,8 @@ export const SPREADS: SpreadDef[] = [
           </div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${color.hairline}`, paddingBottom: 8, ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-              <span>Journal entry</span>
-              <span>Date goes here</span>
+              <EditableText id="s4-je-l" as="span" defaultText="Journal entry" />
+              <EditableText id="s4-je-r" as="span" defaultText="Date goes here" />
             </div>
             <EditableText id="s4-journal" as="p" multiline defaultText="Write the long version here — what happened, who said the dumb thing, why everyone laughed for ten minutes. Future you will want the details." style={{ margin: 0, fontSize: 14, lineHeight: 1.75, color: color.body, textWrap: 'pretty' } as React.CSSProperties} />
           </div>
@@ -213,7 +215,7 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in' }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairlineTinted}`, paddingBottom: 12 }}>Things people actually said</div>
+          <EditableText id="s5-eyebrow" as="div" defaultText="Things people actually said" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairlineTinted}`, paddingBottom: 12 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 30 }}>
             <Quote id="q5-1" text={'“Put the quote here. The dumber, the better.”'} who="— Who said it" />
             <Quote id="q5-2" text={'“Another one for the record.”'} who="— Who said it" />
@@ -239,8 +241,11 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) =>
       quietGrid(
         {
+          eyebrowId: 's6-eyebrow',
           eyebrow: 'Little moments',
+          subId: 's6-sub',
           sub: 'No particular order',
+          dpId: 's6-dp',
           grid: [
             { id: 's6-a', ph: 'Lunch table' },
             { id: 's6-b', ph: 'Someone mid-laugh' },
@@ -264,7 +269,7 @@ export const SPREADS: SpreadDef[] = [
       <>
         <div style={{ background: color.paper, display: 'flex', flexDirection: 'column', padding: '0.7in 0.8in', gap: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }}>
-            <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }}>Field notes</div>
+            <EditableText id="s7-eyebrow" as="div" defaultText="Field notes" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }} />
             <div style={{ width: '1.1in', height: '1.1in' }}>
               <ImageSlot id="s7-tiny" shape="rect" placeholder="tiny pic" />
             </div>
@@ -277,7 +282,7 @@ export const SPREADS: SpreadDef[] = [
               { d: 'Thu —', t: '…' },
             ].map((e, i) => (
               <div key={i} style={{ display: 'flex', gap: 16 }}>
-                <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.15em', color: color.muted, minWidth: '0.9in' }}>{e.d}</div>
+                <EditableText id={`s7-${i}-d`} as="div" defaultText={e.d} style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.15em', color: color.muted, minWidth: '0.9in' }} />
                 <EditableText id={`s7-${i}`} as="p" multiline defaultText={e.t} style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: color.body }} />
               </div>
             ))}
@@ -285,7 +290,7 @@ export const SPREADS: SpreadDef[] = [
           <Folio show={sp} n="12" />
         </div>
         <div style={{ background: color.paperTinted, display: 'flex', flexDirection: 'column', padding: '0.7in 0.8in', gap: 8 }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }}>Sign here, idiots</div>
+          <EditableText id="s7-eyebrow-b" as="div" defaultText="Sign here, idiots" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }} />
           <EditableText id="s7-note" as="p" defaultText="Leave a note. Be nice. Or don't — it's going in print either way." style={{ margin: '0 0 10px', fontSize: 15, fontStyle: 'italic', color: color.body }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
             {Array.from({ length: 7 }).map((_, i) => (
@@ -303,8 +308,8 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }}>The cast</div>
-          <div style={{ fontSize: 14, fontStyle: 'italic', color: color.muted }}>in order of appearance, allegedly</div>
+          <EditableText id="cast-eyebrow" as="div" defaultText="The cast" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }} />
+          <EditableText id="cast-sub" as="div" defaultText="in order of appearance, allegedly" style={{ fontSize: 14, fontStyle: 'italic', color: color.muted }} />
         </div>
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(6,minmax(0,1fr))', gap: '0.45in', alignItems: 'start' }}>
           {[
@@ -346,8 +351,8 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-          <span>Caught on camera</span>
-          <span>Six frames, zero context</span>
+          <EditableText id="strip-eyebrow" as="span" defaultText="Caught on camera" />
+          <EditableText id="strip-sub" as="span" defaultText="Six frames, zero context" />
         </div>
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(6,minmax(0,1fr))', gap: '0.22in' }}>
           {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -374,8 +379,8 @@ export const SPREADS: SpreadDef[] = [
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in', gap: 16, borderLeft: `1px solid ${color.hairline}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${color.hairline}`, paddingBottom: 10, ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-            <span>Journal entry</span>
-            <span>Date goes here</span>
+            <EditableText id="s12-je-l" as="span" defaultText="Journal entry" />
+            <EditableText id="s12-je-r" as="span" defaultText="Date goes here" />
           </div>
           <EditableText id="s12-title" as="p" defaultText="Give this one a title." style={{ margin: 0, fontSize: 20, fontStyle: 'italic', lineHeight: 1.5 }} />
           <EditableText id="s12-body" as="p" multiline defaultText={'A full page for the story. Start in the middle of it — “So there we were,” always works. Include who panicked first.'} style={{ margin: 0, fontSize: 14, lineHeight: 1.8, color: color.body, flex: 1, textWrap: 'pretty' } as React.CSSProperties} />
@@ -390,7 +395,7 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in' }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairlineTinted}`, paddingBottom: 12 }}>The awards nobody asked for</div>
+          <EditableText id="sup-eyebrow" as="div" defaultText="The awards nobody asked for" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairlineTinted}`, paddingBottom: 12 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
             {['Most likely to be famous', 'Most likely to be late to their own wedding', 'Best laugh heard three classrooms away', 'Most detentions survived', 'Human alarm clock (never worked)', 'Lifetime achievement in doing nothing'].map((title, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 16 }}>
@@ -420,8 +425,11 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) =>
       quietGrid(
         {
+          eyebrowId: 's14-eyebrow',
           eyebrow: 'More little moments',
+          subId: 's14-sub',
           sub: 'Still no order',
+          dpId: 's14-dp',
           grid: [
             { id: 's14-a', ph: 'The walk home' },
             { id: 's14-b', ph: 'Bad cafeteria food' },
@@ -453,7 +461,7 @@ export const SPREADS: SpreadDef[] = [
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in', borderLeft: `1px solid ${color.hairline}` }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }}>Overheard, volume II</div>
+          <EditableText id="s15-eyebrow" as="div" defaultText="Overheard, volume II" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 30 }}>
             <Quote id="q15-1" text={'“More quotes go here as you collect them.”'} who="— Who said it" />
             <Quote id="q15-2" text={'“Context optional. Accuracy optional.”'} who="— Who said it" />
@@ -470,8 +478,8 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-          <span>Places we'll pretend not to miss</span>
-          <span>Spoiler: we'll miss them</span>
+          <EditableText id="places-eyebrow" as="span" defaultText="Places we'll pretend not to miss" />
+          <EditableText id="places-sub" as="span" defaultText="Spoiler: we'll miss them" />
         </div>
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: '0.3in' }}>
           {[
@@ -501,7 +509,7 @@ export const SPREADS: SpreadDef[] = [
       <>
         <div style={{ background: color.paper, display: 'flex', flexDirection: 'column', padding: '0.7in 0.8in', gap: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }}>
-            <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }}>Field notes, week two</div>
+            <EditableText id="s17-eyebrow" as="div" defaultText="Field notes, week two" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted }} />
             <div style={{ width: '1.1in', height: '1.1in' }}>
               <ImageSlot id="s17-tiny" shape="rect" placeholder="tiny pic" />
             </div>
@@ -515,7 +523,7 @@ export const SPREADS: SpreadDef[] = [
               { d: 'Fri —', t: '…' },
             ].map((e, i) => (
               <div key={i} style={{ display: 'flex', gap: 16 }}>
-                <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.15em', color: color.muted, minWidth: '0.9in' }}>{e.d}</div>
+                <EditableText id={`s17-${i}-d`} as="div" defaultText={e.d} style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.15em', color: color.muted, minWidth: '0.9in' }} />
                 <EditableText id={`s17-${i}`} as="p" multiline defaultText={e.t} style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: color.body }} />
               </div>
             ))}
@@ -539,14 +547,14 @@ export const SPREADS: SpreadDef[] = [
             <ImageSlot id="s18-a" shape="rect" placeholder="A dumb tradition we invented" />
           </div>
           <div style={{ gridRow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 6 }}>
-            <div style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>Date · Place</div>
+            <EditableText id="s18-dp-a" as="div" defaultText="Date · Place" style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }} />
             <EditableText id="s18-cap-a" as="p" defaultText="Caption goes here." style={{ margin: 0, fontSize: 14, fontStyle: 'italic', lineHeight: 1.5 }} />
           </div>
           <div style={{ gridRow: 2 }}>
             <ImageSlot id="s18-b" shape="rect" placeholder="Proof it happened twice" />
           </div>
           <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 6 }}>
-            <div style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>Date · Place</div>
+            <EditableText id="s18-dp-b" as="div" defaultText="Date · Place" style={{ ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }} />
             <EditableText id="s18-cap-b" as="p" defaultText="And here." style={{ margin: 0, fontSize: 14, fontStyle: 'italic', lineHeight: 1.5 }} />
           </div>
           <Folio show={sp} n="32" style={{ gridColumn: '1 / -1' }} />
@@ -557,8 +565,8 @@ export const SPREADS: SpreadDef[] = [
           </div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${color.hairline}`, paddingBottom: 8, ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-              <span>Journal entry</span>
-              <span>Date goes here</span>
+              <EditableText id="s18-je-l" as="span" defaultText="Journal entry" />
+              <EditableText id="s18-je-r" as="span" defaultText="Date goes here" />
             </div>
             <EditableText id="s18-journal" as="p" multiline defaultText="Room for the long version. What almost went wrong, what definitely went wrong, and how it became the best part." style={{ margin: 0, fontSize: 14, lineHeight: 1.75, color: color.body, textWrap: 'pretty' } as React.CSSProperties} />
           </div>
@@ -583,7 +591,7 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in' }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairlineTinted}`, paddingBottom: 12 }}>The last everything</div>
+          <EditableText id="lf-eyebrow" as="div" defaultText="The last everything" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairlineTinted}`, paddingBottom: 12 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
             {['Last lunch at our table', 'Last time being told to quiet down', 'Last exam. Ever. (Here, anyway.)', 'Last walk through the gates', 'Add your own last thing'].map((t, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
@@ -615,8 +623,8 @@ export const SPREADS: SpreadDef[] = [
       <>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.24in', padding: '0.6in' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', ...sansLabel, fontSize: 9, letterSpacing: '0.22em', color: color.muted }}>
-            <span>Even more little moments</span>
-            <span>We kept taking pictures</span>
+            <EditableText id="s21-eyebrow" as="span" defaultText="Even more little moments" />
+            <EditableText id="s21-sub" as="span" defaultText="We kept taking pictures" />
           </div>
           <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gridTemplateRows: 'minmax(0,1fr) minmax(0,1fr)', gap: '0.2in' }}>
             <ImageSlot id="s21-a" shape="rect" placeholder="Last-week energy" />
@@ -666,7 +674,7 @@ export const SPREADS: SpreadDef[] = [
     render: (sp) => (
       <>
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0.75in 0.8in', gap: 20 }}>
-          <div style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }}>Do not open until you're old(er)</div>
+          <EditableText id="letter-eyebrow" as="div" defaultText="Do not open until you're old(er)" style={{ ...sansLabel, fontSize: 10, letterSpacing: '0.28em', color: color.muted, borderBottom: `1px solid ${color.hairline}`, paddingBottom: 12 }} />
           <EditableText id="letter-greet" as="p" defaultText="Dear future me," style={{ margin: 0, fontSize: 20, fontStyle: 'italic', lineHeight: 1.5 }} />
           <EditableText id="letter-body" as="p" multiline defaultText="Write the letter here. What you hope stays the same, what you're glad is ending, who you hope you're still talking to. No pressure — but also, all the pressure, because this is permanent." style={{ margin: 0, fontSize: 14, lineHeight: 1.8, color: color.body, flex: 1, textWrap: 'pretty' } as React.CSSProperties} />
           <EditableText id="letter-sign" as="p" defaultText="— past you, who knew nothing" style={{ margin: 0, fontSize: 16, fontStyle: 'italic', textAlign: 'right' }} />

@@ -5,6 +5,8 @@
 // devices and in the print-to-PDF output.
 
 import { getSync } from './sync';
+import { CLOUD } from './mode';
+import { LocalTextStore } from './local-text';
 
 const CHANNEL = 'school-memories-text';
 const POLL_BACKSTOP_MS = 30_000;
@@ -12,7 +14,17 @@ const POLL_FALLBACK_MS = 5_000;
 
 type Listener = (id: string) => void;
 
-class TextStore {
+// Backend-agnostic surface both the R2-backed TextStore (cloud) and the
+// localStorage LocalTextStore (browser-only) satisfy.
+export interface TextStoreApi {
+  load(): Promise<void>;
+  isLoaded(): boolean;
+  get(id: string): string | null;
+  set(id: string, text: string): void;
+  subscribe(fn: Listener): () => void;
+}
+
+class TextStore implements TextStoreApi {
   private cache: Record<string, string> = {};
   private loaded = false;
   private loadP: Promise<void> | null = null;
@@ -104,9 +116,9 @@ class TextStore {
   }
 }
 
-let _store: TextStore | null = null;
-export function getTextStore(): TextStore {
-  if (!_store) _store = new TextStore();
+let _store: TextStoreApi | null = null;
+export function getTextStore(): TextStoreApi {
+  if (!_store) _store = CLOUD ? new TextStore() : new LocalTextStore();
   return _store;
 }
 

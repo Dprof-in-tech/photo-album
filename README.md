@@ -11,6 +11,37 @@ exact values).
    tappable box grouped by spread; a drop here lands in the matching album slot
    because both surfaces key on the **same slot ids** in a shared datastore.
 
+## Two builds from one codebase
+
+The same source ships as two Cloudflare Pages projects, told apart only by the
+`PUBLIC_STORAGE_MODE` build flag (inlined by Astro at build time). Every
+component funnels through `getStore()` / `getTextStore()`, which return a
+different implementation per mode — so nothing else changes.
+
+| | **Private** (`cloud`) | **Public** (`local`) |
+|---|---|---|
+| `PUBLIC_STORAGE_MODE` | `cloud` (default when unset) | `local` |
+| Photos | R2 bucket (`src/lib/store.ts`) | IndexedDB (`src/lib/local-store.ts`) |
+| Copy/settings | R2 `text.json` (`src/lib/text.ts`) | localStorage (`src/lib/local-text.ts`) |
+| Sync | cross-tab + cross-device (WebSocket relay) | cross-tab only (BroadcastChannel) |
+| PDF | Browser-Rendering Worker | `/print` → browser Save-as-PDF |
+| Server/storage liability | just you (behind Cloudflare Access) | **none — nothing leaves the device** |
+| Pages project | `school-memories-album` | `memories` (memories-3es.pages.dev) |
+| Deploy | `pnpm run deploy` | `pnpm run deploy:public` |
+
+The public project must carry **no bindings** — `LocalStore` never calls `/api/*`,
+so binding the R2 bucket there would let the dormant API routes expose the private
+bucket. Pages only reads a root `wrangler.toml`, and this repo's root config holds
+the private R2/service bindings, so `deploy:public` temporarily moves it aside and
+deploys `dist` binding-free (the deployed `/api/*` routes then just 500, which
+nothing calls). The `PhotoStoreApi` / `TextStoreApi` interfaces (`store.ts` /
+`text.ts`) are the contract both implementations satisfy.
+
+Because a browser-only album lives only on that device, the `local` build's
+album toolbar adds **Export album** / **Import album** (`src/lib/backup.ts`): one
+portable JSON with photos inlined as data URLs + all copy — the user's own
+backup, and how they move an album between browsers or devices.
+
 ## Stack
 
 - **Astro + React islands** — each surface is a single `client:load` island (they're
@@ -84,6 +115,23 @@ pnpm run deploy                                                     # astro buil
 `PDF_RENDERER` service binding are applied from `wrangler.toml`; the Browser Rendering
 binding lives in the separate PDF Worker (`workers/pdf-renderer/`). No dashboard steps.
 
+### Public (browser-only) build
+
+The public, zero-liability build is a separate Pages project with no bindings:
+
+```sh
+pnpm exec wrangler pages project create memories --production-branch main   # once
+pnpm run deploy:public   # builds with PUBLIC_STORAGE_MODE=local, then deploys dist binding-free
+```
+
+Live at **https://memories-3es.pages.dev**.
+
+It stores photos + copy in the visitor's own browser (IndexedDB/localStorage),
+so there's no bucket, no cost that scales with users, and no data of anyone
+else's on your infrastructure. Lock the private project down to just you with
+**Cloudflare Access** (email allowlist) so strangers can't reach the R2-backed
+`/api/*` routes.
+
 ## Features
 
 - `ImageSlot` component: tap/drag-to-upload → **print-quality** webp encode → shared
@@ -104,8 +152,11 @@ binding lives in the separate PDF Worker (`workers/pdf-renderer/`). No dashboard
 - **All 22 album spreads** at exact print geometry, scaled to fit the viewport —
   cover wrap, intro, three full-bleeds, photo+journal spreads, quote pages, 2×2 grids,
   the cast (6 circle portraits), filmstrip, superlatives, places, field notes,
-  last-firsts, wildcards, and the closing letter. 51 photo slots, 91 editable copy
-  blocks, `showPageNumbers` folio toggle.
+  last-firsts, wildcards, and the closing letter. 51 photo slots and ~155 editable
+  copy blocks — **every** piece of text is editable, from the cover title
+  ("3 Idiots & the Stooges") through section headings, captions, quotes, names,
+  journal entries, and field labels; only the auto page-number folios are fixed.
+  `showPageNumbers` folio toggle.
 - Full **Photo Drop** app: sticky header, live progress meter (N of 51), all 22 spread
   sections from the canonical slot manifest, spanned/hero slots, footer.
 - **3D flip book** (`/book`): a real bound-book preview (react-pageflip) with a center
